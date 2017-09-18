@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Animasi Teks Matrix</title>
+	<style type="text/css">
+
+		.matrix{
+			font-family: lucida Console, courier, Monotype;
+			font-size: 22pt;
+			text-align: center;
+			width: 37px;
+			height: 60px;
+			padding: 0px;
+			margin: 0px;
+		}
+	</style>
+	<script type="text/javascript" language="JavaScript">
+		// harus bilangan ganjil
+		var baris=11;
+		// lebih kecil = lebih cepat
+		var kecepatan=5;
+		// hanya diantara 0 dan 2. yang paling tinggi paling cepat
+		var menampakkan=2;
+		// "center akan ditengah"
+		var alignefek="default"
+		// untuk browser
+		var w3c=document.getElementById && !window.opera;;
+		var ie45=document.all && !window.opera;
+		var matrix_tab, cobamatrix, matrix_body, matrix_baris, x, y, kolom, matrix_teks, matrix_kolom;
+		var coba1=new Array();
+		var coba2=new Array();
+		window.onload=function(){
+			if (!w3c && !ie45) return
+				var matrix=(w3c)?document.getElementById("matrix"):document.all["matrix"];
+				matrix_teks=(w3c)?matrix.firstChild.nodeValue:matrix.innerHTML;
+				matrix_teks=""+matrix_teks+"";
+				kolom=matrix_teks.length;
+				if (w3c) {
+					while(matrix.childNodes.length)
+						matrix.removeChild(matrix.childNodes[0]);
+					matrix_tab=document.createElement("table");
+					matrix_tab.setAttribute("border",0);
+					matrix_tab.setAttribute("align",alignefek);
+					matrix_tab.style.backgroundColor="#000000";
+					matrix_body=document.createElement("tbody");
+					for (x=0; x<baris; x++){
+						matrix_baris=document.createElement("tr");
+						for(y=0; y<kolom; y++){
+							cobamatrix=document.createElement("td");
+							cobamatrix.setAttribute("id","Mx"+x+"y"+y);
+							cobamatrix.className="matrix";
+							cobamatrix.appendChild(document.createTextNode(String.fromCharCode(160)));
+							matrix_baris.appendChild(cobamatrix);
+						}
+						matrix_body.appendChild(matrix_baris);
+					}
+					matrix_tab.appendChild(matrix_body);
+					matrix.appendChild(matrix_tab);
+				} else {
+					matrix_tab ='<ta'+'ble align="'+alignefek+'" border="0" style="background-color:#000000"> ';
+					for (var x=0; x<baris; x++){
+						matrix_tab+='<t'+'r>';
+						for (var y=0; y<kolom;y++){
+							matrix_tab+='<t'+'d class="matrix" id="Mx'+x+'y'+y+'">&nbsp;</'+'td> ';
+						}
+						matrix_tab+='</'+'tr>';
+					}
+					matrix_tab+='</'+'table>';
+					matrix.innerHTML=matrix_tab;
+				}
+				matrix_kolom=matrix_teks;
+				for(x=0; x<kolom; x++){
+					matrix_kolom+=String.fromCharCode(32+Math.floor(Math.random()*94));
+					coba2[x]=0;
+				}
+				matrix_body=setInterval("cara()", kecepatan);
+		}
+		function cara(){
+			x=0
+			for (y=0; y<kolom; y++){
+				x=x+(coba2[y]==100);
+				matrix_baris=coba2[y]%100;
+				if (matrix_baris && coba2[y]<100) {
+					if (matrix_baris<baris+1) {
+						if (w3c) {
+							cobamatrix=document.getElementById("Mx"+(matrix_baris-1)+"y"+y);
+							cobamatrix.firstChild.nodeValue=coba1[y];
+						} else{
+							cobamatrix=document.all["Mx"+(matrix_baris-1)+"y"+y];
+							cobamatrix.innerHTML=coba1[y];
+						}
+						cobamatrix.style.color="#33ff66";
+						cobamatrix.style.fontWeight="bold";
+					}
+					if (matrix_baris>1 && matrix_baris<baris+2) {
+						cobamatrix=(w3c)?document.getElementById("Mx"+(matrix_baris-2)+"y"+y):document.all["Mx"+(matrix_baris-2)+"y"+y];
+						cobamatrix.style.fontWeight="normal";
+						cobamatrix.style.color="#00ff00";
+					}
+					if (matrix_baris>2) {
+						cobamatrix=(w3c)?document.getElementById("Mx"+(matrix_baris-3)+"y"+y):document.all["Mx"+(matrix_baris-3)+"y"+y];
+						cobamatrix.style.color="#009900";
+					}
+					if (matrix_baris<Math.floor(baris/2)+1)coba2[y]++;
+					else if (matrix_baris==Math.floor(baris/2)+1 && coba1[y]==matrix_teks.charAt(y)) meningkat(y);
+					else if (matrix_baris<baris+2) coba2[y]++;
+					else if (coba2[y]<100) coba2[y]=0;
+				}
+				else if (Math.random()>0.9 && coba2[y]<100) {
+					coba1[y]=matrix_kolom.charAt(Math.floor(Math.random()*matrix_kolom.length));
+					coba2[y]++;
+				}
+			}
+			if (x==kolom) clearInterval(matrix_body);
+		}
+		function meningkat(ykolom){
+			var msatu, mdua, ysatu;
+			if (coba2[ykolom]==Math.floor(baris/2)+1) {
+				for(ysatu=0; ysatu<baris; ysatu++){
+					if (w3c) {
+						msatu=document.getElementById("Mx"+ysatu+"y"+ykolom);
+						msatu.firstChild.nodeValue=coba1[ykolom];
+					} else {
+						msatu=document.all["Mx"+ysatu+"y"+ykolom];
+						msatu.innerHTML=coba1[ykolom];
+					}
+					msatu.style.color="#33ff66";
+					msatu.style.fontWeight="bold";
+				}
+				if (Math.random()<menampakkan) {
+					msatu=matrix_kolom.indexOf(matrix_teks.charAt(ykolom));
+
+					matrix_kolom=matrix_kolom.substring(0,msatu)+matrix_kolom.substring(msatu+1, matrix_kolom.length);
+				}
+				if (Math.random()<menampakkan-1)
+					matrix_kolom=matrix_kolom.substring(0, matrix_kolom.length-1);
+				coba2[ykolom]+=199;
+				setTimeout("meningkat("+ykolom+")", kecepatan);
+			}
+			else if (coba2[ykolom]>200) {
+				if (w3c) {
+					msatu=document.getElementById("Mx"+(coba2[ykolom]-201)+"y"+ykolom);
+					mdua=document.getElementById("Mx"+(200+baris-coba2[ykolom]--)+"y"+ykolom);
+				}
+				else {
+					msatu=document.all["Mx"+(coba2[ykolom]-201)+"y"+ykolom];
+					mdua=document.all["Mx"+(200+baris-coba2[ykolom]--)+"y"+ykolom];
+				}
+				msatu.style.fontWeight="normal";
+				mdua.style.fontWeight="normal";
+				setTimeout("meningkat("+ykolom+"),kecepatan");
+			}
+			else if (coba2[ykolom]==200)coba2[ykolom]=100+Math.floor(baris/2);
+			if (coba2[ykolom]>100 && coba2[ykolom]<200) {
+				if (w3c) {
+					msatu=document.getElementById("Mx"+(coba2[ykolom]-101)+"y"+ykolom);
+					msatu.firstChild.nodeValue=String.fromCharCode(160);
+					mdua=document.getElementById("Mx"+(100+baris-coba2[ykolom]--)+"y"+ykolom);
+					mdua.firstChild.nodeValue=String.fromCharCode(160);
+				}else{
+					msatu=document.all["Mx"+(coba2[ykolom]-101)+"y"+ykolom];
+					msatu.innerHTML=String.fromCharCode(160);
+					mdua=document.all["Mx"+(100+baris-coba2[ykolom]--)+"y"+ykolom];
+					mdua.innerHTML=String.fromCharCode(160);
+				}
+				setTimeout("meningkat("+ykolom+"),kecepatan ");
+			}
+		}
+	</script>
+</head>
+<body>
+<div id="matrix" >
+	Happy Birth Day Anggie Poetri :)
+</div>
+
+</body>
+</html>
